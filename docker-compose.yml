@@ -1,0 +1,30 @@
+version: '3.0'
+
+services:
+  gocd-server:
+    image: gocd/gocd-server:v17.10.0
+    volumes:
+      - './volumes/gocd-server:/godata'
+    ports:
+      - 8153:8153
+      - 8154:8154
+    expose:
+      - 8153
+      - 8154
+
+  gocd-agent-nodejs:
+    build: ./gocd-agent-nodejs
+    volumes:
+      - './volumes/gocd-agent:/godata'
+    environment:
+      - GO_SERVER_URL=https://gocd-server:8154/go
+      # - NPM_CONFIG_REGISTRY=http://nexus:8081/repository/pyfarm
+
+  nexus:
+    image:  sonatype/nexus3
+    ports:
+      - 5000:8081
+    expose:
+      - 5000
+    volumes:
+      - ./volumes/nexus:/nexus-data
